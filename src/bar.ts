@@ -163,6 +163,8 @@ export function barChart<Datum>(
 
       const exit: SelectionCall = (s) =>
         s
+          .attr('opacity', 1)
+          .attr('fill-opacity', 1)
           .transition(t)
           .attr('y', height)
           .attr('opacity', 1e-6)
