@@ -1,0 +1,22 @@
+html,body {
+    background-color: #333333;
+}
+
+text {
+    font: bold 48px monospace;
+}
+
+.enter {
+    fill: green;
+}
+
+.update {
+    fill: #fff;
+}
+
+.exit {
+    fill: brown;
+}
+
+
+/*# sourceMappingURL=/demo.56710ae6.css.map */
