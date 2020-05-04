@@ -96,20 +96,20 @@ export function barChart<Datum>(
 
       // prettier-ignore
       rects
-                .enter()
-                .append('rect')
-                .attr('class', 'bar')
-                .attr('x', 0)
-                .attr('y', height)
-                .attr('fill', (d) => hashRGB(d[options.dimensionKey]))
-                .attr('height', yScale.bandwidth())
-                .attr('fill-opacity', 1e-6)
-                .merge(rects)
-                .transition(t)
-                .attr('y', (datum, i) => yScale(i))
-                .attr('width', (datum: Datum) => xScale(getMetric(datum)))
-                .attr('height', yScale.bandwidth())
-                .attr('fill-opacity', 1);
+        .enter()
+        .append('rect')
+        .attr('class', 'bar')
+        .attr('x', 0)
+        .attr('y', height)
+        .attr('fill', (d) => hashRGB(d[options.dimensionKey]))
+        .attr('height', yScale.bandwidth())
+        .attr('fill-opacity', 1e-6)
+        .merge(rects)
+        .transition(t)
+        .attr('y', (datum, i) => yScale(i))
+        .attr('width', (datum: Datum) => xScale(getMetric(datum)))
+        .attr('height', yScale.bandwidth())
+        .attr('fill-opacity', 1);
 
       const labelStyle: SelectionCall = (s) =>
         s
