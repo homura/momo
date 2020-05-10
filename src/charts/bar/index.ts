@@ -4,9 +4,9 @@ import * as _ from 'lodash';
 import { hashRGB } from './utils';
 
 interface RenderOptions<Datum> {
-  mainDimensionKey: keyof Datum;
-  dimensionKey: keyof Datum;
-  metricKey: keyof Datum;
+  mainDimensionKey: string;
+  dimensionKey: string;
+  metricKey: string;
 }
 
 interface SelectionCall<
@@ -18,46 +18,52 @@ interface SelectionCall<
   (selection: Selection<GElement, Datum, PElement, PDatum>): any;
 }
 
-interface RankingRenderer {
-  render: () => Promise<void>;
+export interface RankingRenderer<Datum = any> {
+  render: (datum: Datum[], options: RenderOptions<Datum>) => Promise<void>;
+  remove: () => void;
 }
 
 export function barChart<Datum>(
-  selector: string,
-  datum: Datum[],
-  options: RenderOptions<Datum>,
-): RankingRenderer {
+  selector: string | BaseType,
+): RankingRenderer<Datum> {
+  // @ts-ignore
   const svg = d3.select(selector);
-  const width = Number(svg.attr('width'));
-  const height = Number(svg.attr('height'));
+  const width = 960;
+  const height = 540;
 
-  // main dimension bottom right of the chart
-  svg.append('text').attr('class', 'dimension-main').style('font-size', '64px');
+  async function render(
+    datum: Datum[],
+    options: RenderOptions<Datum>,
+  ): Promise<void> {
+    const getMainDimension = (data: Datum): string =>
+      _.get(data, options.mainDimensionKey);
 
-  const getMainDimension = (data: Datum): string =>
-    _.get(data, options.mainDimensionKey);
+    const getDimension = (data: Datum): string =>
+      _.get(data, options.dimensionKey);
+    const getMetric = (data: Datum): number => _.get(data, options.metricKey);
 
-  const getDimension = (data: Datum): string =>
-    _.get(data, options.dimensionKey);
-  const getMetric = (data: Datum): number => _.get(data, options.metricKey);
+    const margin = {
+      top: 30,
+      right: 80,
+      bottom: 30,
+      left: 20,
+    };
 
-  const margin = {
-    top: 30,
-    right: 80,
-    bottom: 30,
-    left: 20,
-  };
+    // main dimension bottom right of the chart
+    svg
+      .append('text')
+      .attr('class', 'dimension-main')
+      .style('font-size', '64px');
 
-  const nested = d3
-    .nest<Datum>()
-    .key(getMainDimension)
-    .sortKeys((a, b) => a.localeCompare(b))
-    .sortValues(
-      (a, b) => Number(b[options.metricKey]) - Number(a[options.metricKey]),
-    )
-    .entries(datum);
+    const nested = d3
+      .nest<Datum>()
+      .key(getMainDimension)
+      .sortKeys((a, b) => a.localeCompare(b))
+      .sortValues(
+        (a, b) => Number(b[options.metricKey]) - Number(a[options.metricKey]),
+      )
+      .entries(datum);
 
-  async function render(): Promise<void> {
     const xScale = d3
       .scaleLinear()
       .range([0, width - margin.left - margin.right]);
@@ -82,6 +88,8 @@ export function barChart<Datum>(
         .attr('text-anchor', 'end')
         .attr('x', width - margin.right)
         .attr('y', height - margin.bottom)
+        .attr('fill', '#eee')
+        .attr('stroke', '#333')
         .text(data.key);
 
       const rects = svg
@@ -123,7 +131,6 @@ export function barChart<Datum>(
               // @ts-ignore
               .formatHex(),
           )
-          .attr('stroke-width', '1px')
           .style(' stroke-linecap', 'butt')
           .attr('fill', '#fff')
           .style('font-size', '28px')
@@ -175,9 +182,17 @@ export function barChart<Datum>(
       dimensionLabels.exit().call(exit);
       metricLabels.exit().call(exit);
 
-      await t.end();
+      if (t) {
+        await t.end();
+      } else {
+        break;
+      }
     }
   }
 
-  return { render };
+  function remove() {
+    svg.remove();
+  }
+
+  return { render, remove };
 }

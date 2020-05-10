@@ -1,33 +1,21 @@
-import React, { useRef } from 'react';
+import { Layout } from 'antd';
+import { StoreProvider } from 'easy-peasy';
+import React from 'react';
 import './App.css';
-import { barChart } from './charts/bar';
-import { csv } from './data';
-import * as d3 from 'd3';
+import { Editor } from './containers/Editor';
+import { store } from './store';
+
+const { Content } = Layout;
 
 function App() {
-  const chartRef = useRef();
-
-  React.useLayoutEffect(() => {
-    const svg = chartRef.current;
-    barChart(
-      svg,
-      d3.csvParse(csv, (d) => ({
-        state: d.state,
-        date: d.date,
-        cases: Number(d.cases),
-      })),
-      {
-        metricKey: 'cases',
-        mainDimensionKey: 'date',
-        dimensionKey: 'state',
-      },
-    ).render();
-  });
-
   return (
-    <div className="App">
-      <svg width="960" height="540" ref={chartRef} />
-    </div>
+    <StoreProvider store={store}>
+      <Layout>
+        <Content>
+          <Editor />
+        </Content>
+      </Layout>
+    </StoreProvider>
   );
 }
 
