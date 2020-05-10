@@ -15,7 +15,7 @@ export const Editor = () => {
       csvText: csv,
       name: 'COVID-19-USA',
     });
-  }, []);
+  }, [loadCSV]);
 
   const downloadDemoCSV = () => {
     const file = new File([csv], 'demo.csv', {

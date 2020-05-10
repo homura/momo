@@ -17,7 +17,7 @@ export const ChartStage = () => {
         });
       }
     },
-    [editor.data],
+    [editor.comparison, editor.data, editor.dimension, editor.metric],
   );
 
   return (
