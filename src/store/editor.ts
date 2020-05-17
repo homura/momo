@@ -78,6 +78,7 @@ export const editorModel: EditorModel = {
   loadCSV: thunk(async (actions, payload) => {
     const parseResult = parse(payload.csvText, {
       header: true,
+      skipEmptyLines: true,
     });
 
     const { meta, data } = parseResult;
