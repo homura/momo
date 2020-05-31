@@ -1,7 +1,9 @@
 import * as d3 from 'd3';
-import { BaseType, Selection } from 'd3';
+import { BaseType, Selection, Transition } from 'd3';
 import * as _ from 'lodash';
-import { hashRGB } from './utils';
+import { hashRGB } from '../utils';
+
+type Status = 'start' | 'stop';
 
 interface RenderOptions<Datum> {
   mainDimensionKey: string;
@@ -21,15 +23,29 @@ interface SelectionCall<
 export interface RankingRenderer<Datum = any> {
   render: (datum: Datum[], options: RenderOptions<Datum>) => Promise<void>;
   remove: () => void;
+  stop: () => Promise<void>;
 }
 
-export function barChart<Datum>(
+export function barChart<Datum = any>(
   selector: string | BaseType,
 ): RankingRenderer<Datum> {
   // @ts-ignore
-  const svg = d3.select(selector);
+  let svg = d3.select(selector);
   const width = 960;
   const height = 540;
+
+  let transition: Transition<BaseType, Datum, null, undefined>;
+  let status: Status = 'stop';
+
+  function remove() {
+    console.log(svg.selectAll('*'));
+    svg.selectAll('*').remove();
+  }
+
+  async function stop(): Promise<void> {
+    status = 'stop';
+    remove();
+  }
 
   async function render(
     datum: Datum[],
@@ -53,7 +69,12 @@ export function barChart<Datum>(
     svg
       .append('text')
       .attr('class', 'dimension-main')
-      .style('font-size', '64px');
+      .style('font-size', '64px')
+      .attr('text-anchor', 'end')
+      .attr('x', width - margin.right)
+      .attr('y', height - margin.bottom)
+      .attr('fill', '#eee')
+      .attr('stroke', '#333');
 
     const nested = d3
       .nest<Datum>()
@@ -73,7 +94,17 @@ export function barChart<Datum>(
       .paddingInner(0.2)
       .padding(0.3);
 
+    status = 'start';
+
+    function shouldContinueTransition() {
+      return status === 'start';
+    }
+
     for (let current = 0; current < nested.length; current++) {
+      if (!shouldContinueTransition()) break;
+
+      transition = d3.transition<Datum>().duration(750);
+
       const data = nested[current];
       const values = data.values.slice(0, 10);
 
@@ -81,16 +112,7 @@ export function barChart<Datum>(
       xScale.domain([0, maxMetric]);
       yScale.domain(d3.range(values.length));
 
-      const t = d3.transition().duration(750);
-
-      svg
-        .select('.dimension-main')
-        .attr('text-anchor', 'end')
-        .attr('x', width - margin.right)
-        .attr('y', height - margin.bottom)
-        .attr('fill', '#eee')
-        .attr('stroke', '#333')
-        .text(data.key);
+      svg.select('.dimension-main').text(data.key);
 
       const rects = svg
         .selectAll<SVGRectElement, Datum>('.bar')
@@ -113,7 +135,7 @@ export function barChart<Datum>(
         .attr('height', yScale.bandwidth())
         .attr('fill-opacity', 1e-6)
         .merge(rects)
-        .transition(t)
+        .transition(transition)
         .attr('y', (datum, i) => yScale(i))
         .attr('width', (datum: Datum) => xScale(getMetric(datum)))
         .attr('height', yScale.bandwidth())
@@ -143,7 +165,7 @@ export function barChart<Datum>(
         .call(labelStyle)
         .text(getDimension)
         .merge(dimensionLabels)
-        .transition(t)
+        .transition(transition)
         .attr('opacity', 1)
         .attr('y', (datum, i) => yScale(i) + yScale.bandwidth() / 2)
         .attr('x', (datum: Datum) => xScale(getMetric(datum)) - 10);
@@ -156,7 +178,7 @@ export function barChart<Datum>(
         .attr('class', 'label-metric')
         .style('font-size', '24px')
         .merge(metricLabels)
-        .transition(t)
+        .transition(transition)
         //@ts-ignore
         .textTween(function (datum, i) {
           const last = getMetric(nested?.[current - 1]?.values?.[i]) ?? 0;
@@ -172,7 +194,7 @@ export function barChart<Datum>(
         s
           .attr('opacity', 1)
           .attr('fill-opacity', 1)
-          .transition(t)
+          .transition(transition)
           .attr('y', height)
           .attr('opacity', 1e-6)
           .attr('fill-opacity', 1e-6)
@@ -182,17 +204,17 @@ export function barChart<Datum>(
       dimensionLabels.exit().call(exit);
       metricLabels.exit().call(exit);
 
-      if (t) {
-        await t.end();
+      if (transition && status === 'start') {
+        try {
+          await transition.end();
+        } catch (e) {
+          break;
+        }
       } else {
         break;
       }
     }
   }
 
-  function remove() {
-    svg.remove();
-  }
-
-  return { render, remove };
+  return { render, remove, stop };
 }
