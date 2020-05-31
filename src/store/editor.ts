@@ -1,13 +1,10 @@
 import { action, Action, computed, Computed, thunk, Thunk } from 'easy-peasy';
 import { parse } from 'papaparse';
 
-interface SetDataPayload {
-  data: any[];
-  dataTitle: string;
-  columns: string[];
-  dimension: string;
-  comparison: string;
-  metric: string;
+enum DataStatus {
+  Pending = 'Pending',
+  Fulfilled = 'Fulfilled',
+  Rejected = 'Rejected',
 }
 
 interface NamedCSV {
@@ -15,8 +12,21 @@ interface NamedCSV {
   csvText: string;
 }
 
-export interface EditorModel {
+interface SetDataPayload {
+  rawData: string;
   data: any[];
+
+  dataTitle: string;
+  columns: string[];
+  dimension: string;
+  comparison: string;
+  metric: string;
+}
+
+export interface EditorModel {
+  rawData: string;
+  data: any[];
+  dataStatus: DataStatus;
   dataTitle: string;
   columns: string[];
   dimension: string;
@@ -37,8 +47,10 @@ export interface EditorModel {
 type SwitchColumn = Action<EditorModel, string>;
 
 export const editorModel: EditorModel = {
+  rawData: '',
   data: [],
-  dataTitle: '',
+  dataStatus: DataStatus.Fulfilled,
+  dataTitle: 'untitled',
   columns: [],
 
   comparison: '',
@@ -51,8 +63,17 @@ export const editorModel: EditorModel = {
   }),
 
   setupEditor: action((state, payload) => {
-    const { data, columns, dimension, metric, comparison, dataTitle } = payload;
+    const {
+      data,
+      columns,
+      dimension,
+      metric,
+      comparison,
+      dataTitle,
+      rawData,
+    } = payload;
 
+    state.rawData = rawData;
     state.data = data.map((item) => ({
       ...item,
       [metric]: Number(item[metric]),
@@ -87,6 +108,7 @@ export const editorModel: EditorModel = {
     const [dimension, comparison, metric] = columns;
 
     actions.setupEditor({
+      rawData: payload.csvText,
       columns,
       data,
       dimension,

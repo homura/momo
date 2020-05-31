@@ -1,18 +1,26 @@
-import { Form, Select } from 'antd';
-import React from 'react';
+import { Button, Form, Select } from 'antd';
+import React, { useState } from 'react';
 import { useStoreState } from '../../store';
-import { CSVReader } from './CSVReader';
+import { DataLoader } from './DataLoader';
 
 export const Configuration = () => {
-  const { comparison, metric, dimension } = useStoreState(
+  const { comparison, metric, dimension, dataTitle } = useStoreState(
     (state) => state.editor,
   );
 
+  const [dataModalVisible, setDataModalVisible] = useState(false);
+
   return (
     <div>
+      <DataLoader
+        visible={dataModalVisible}
+        onCancel={() => setDataModalVisible(false)}
+      />
       <Form layout="vertical">
         <Form.Item label="data">
-          <CSVReader />
+          <Button onClick={() => setDataModalVisible(true)}>
+            {dataTitle || 'data'}
+          </Button>
         </Form.Item>
         <Form.Item label="dimension">
           <Select value={dimension}>

@@ -2,7 +2,7 @@ import { Button, Upload } from 'antd';
 import { UploadChangeParam } from 'antd/es/upload/interface';
 import { ParseResult } from 'papaparse';
 import React from 'react';
-import { useStoreActions, useStoreState } from '../../store';
+import { useStoreActions, useStoreState } from '../../../store';
 
 export interface CSVReaderProps<T = any> {
   onFileLoaded?: (result: ParseResult) => void;
