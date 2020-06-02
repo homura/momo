@@ -1,20 +1,20 @@
 {
   "files": {
     "main.css": "/momo/static/css/main.de33c089.chunk.css",
-    "main.js": "/momo/static/js/main.d04b3f4d.chunk.js",
+    "main.js": "/momo/static/js/main.47bb732b.chunk.js",
     "runtime-main.js": "/momo/static/js/runtime-main.cdd1d8d8.js",
-    "static/css/2.37baf0c6.chunk.css": "/momo/static/css/2.37baf0c6.chunk.css",
-    "static/js/2.5e08dd37.chunk.js": "/momo/static/js/2.5e08dd37.chunk.js",
+    "static/css/2.2d55b71a.chunk.css": "/momo/static/css/2.2d55b71a.chunk.css",
+    "static/js/2.0f936e71.chunk.js": "/momo/static/js/2.0f936e71.chunk.js",
     "index.html": "/momo/index.html",
-    "precache-manifest.c04b24f6b68f2b063f1d84705ed9fda3.js": "/momo/precache-manifest.c04b24f6b68f2b063f1d84705ed9fda3.js",
+    "precache-manifest.5283f502de6f012f8b3db56a7e435dad.js": "/momo/precache-manifest.5283f502de6f012f8b3db56a7e435dad.js",
     "service-worker.js": "/momo/service-worker.js",
-    "static/js/2.5e08dd37.chunk.js.LICENSE.txt": "/momo/static/js/2.5e08dd37.chunk.js.LICENSE.txt"
+    "static/js/2.0f936e71.chunk.js.LICENSE.txt": "/momo/static/js/2.0f936e71.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.cdd1d8d8.js",
-    "static/css/2.37baf0c6.chunk.css",
-    "static/js/2.5e08dd37.chunk.js",
+    "static/css/2.2d55b71a.chunk.css",
+    "static/js/2.0f936e71.chunk.js",
     "static/css/main.de33c089.chunk.css",
-    "static/js/main.d04b3f4d.chunk.js"
+    "static/js/main.47bb732b.chunk.js"
   ]
 }
