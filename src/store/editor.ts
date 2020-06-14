@@ -1,15 +1,10 @@
 import { action, Action, computed, Computed, thunk, Thunk } from 'easy-peasy';
-import { parse } from 'papaparse';
+import { LoadableCSV, loadCSV } from './common/csv';
 
 enum DataStatus {
   Pending = 'Pending',
   Fulfilled = 'Fulfilled',
   Rejected = 'Rejected',
-}
-
-interface NamedCSV {
-  name: string;
-  csvText: string;
 }
 
 interface SetDataPayload {
@@ -39,8 +34,9 @@ export interface EditorModel {
   switchComparison: SwitchColumn;
   switchMetric: SwitchColumn;
   setupEditor: Action<EditorModel, SetDataPayload>;
+  setDataStatus: Action<EditorModel, DataStatus>;
 
-  loadCSV: Thunk<EditorModel, NamedCSV>;
+  loadCSV: Thunk<EditorModel, LoadableCSV>;
   loadCSVFile: Thunk<EditorModel, File>;
 }
 
@@ -95,20 +91,19 @@ export const editorModel: EditorModel = {
   switchMetric: action((state, metric) => {
     state.metric = metric;
   }),
+  setDataStatus: action((state, dataStats) => {
+    state.dataStatus = dataStats;
+  }),
 
   loadCSV: thunk(async (actions, payload) => {
-    const parseResult = parse(payload.csvText, {
-      header: true,
-      skipEmptyLines: true,
-    });
-
-    const { meta, data } = parseResult;
+    const parseResult = await loadCSV(payload);
+    const { meta, data, rawData } = parseResult;
 
     const columns = meta.fields;
     const [dimension, comparison, metric] = columns;
 
     actions.setupEditor({
-      rawData: payload.csvText,
+      rawData,
       columns,
       data,
       dimension,

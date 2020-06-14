@@ -5,7 +5,7 @@ import React from 'react';
 import { useStoreActions, useStoreState } from '../../../store';
 
 export interface CSVReaderProps<T = any> {
-  onFileLoaded?: (result: ParseResult) => void;
+  onFileLoaded?: (result: ParseResult<T>) => void;
 }
 
 export const CSVReader = (props: CSVReaderProps) => {

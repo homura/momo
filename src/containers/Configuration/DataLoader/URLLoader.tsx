@@ -1,4 +1,4 @@
-import { Modal, Input } from 'antd';
+import { Input, Modal } from 'antd';
 import React, { useState } from 'react';
 
 interface DataLoaderModal {

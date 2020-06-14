@@ -18,9 +18,7 @@ export const Configuration = () => {
       />
       <Form layout="vertical">
         <Form.Item label="data">
-          <Button onClick={() => setDataModalVisible(true)}>
-            {dataTitle || 'data'}
-          </Button>
+          <Button onClick={() => setDataModalVisible(true)}>{dataTitle}</Button>
         </Form.Item>
         <Form.Item label="dimension">
           <Select value={dimension}>

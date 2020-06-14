@@ -1,38 +1,25 @@
 import { Button, Col, Empty, Row } from 'antd';
 import FileSaver from 'file-saver';
-import React, { useEffect } from 'react';
-import { fetchFromGitHubRaw } from '../../data/fetch';
+import React, { useCallback, useEffect } from 'react';
 import { useStoreActions, useStoreState } from '../../store';
 import { ChartStage } from '../ChartStage';
 import { Configuration } from '../Configuration';
-import { parse } from 'query-string';
+import { DEMO_CSV_URL } from '../../constants';
 
 export const Editor = () => {
   const loadCSV = useStoreActions((actions) => actions.editor.loadCSV);
-  const { isEditorSetup } = useStoreState((state) => state.editor);
+  const { isEditorSetup, rawData } = useStoreState((state) => state.editor);
 
   useEffect(() => {
-    const loadExampleData = async () => {
-      const csv = await fetchFromGitHubRaw(
-        'https://gist.githubusercontent.com/homura/8c7329eeece508c603e107bf219c7e62/raw/aefb8405ea8938f57026b8538432f5f172443889/COVID-USA.csv',
-      );
-      console.log(parse(window.location.search));
+    loadCSV({ name: 'example', url: DEMO_CSV_URL });
+  }, []);
 
-      loadCSV({
-        csvText: csv,
-        name: 'COVID-19-USA',
-      });
-    };
-
-    loadExampleData();
-  }, [loadCSV]);
-
-  const downloadDemoCSV = () => {
-    const file = new File([], 'demo.csv', {
+  const downloadDemoCSV = useCallback(() => {
+    const file = new File([rawData], 'demo.csv', {
       type: 'text/csv;charset=utf-8',
     });
     FileSaver.saveAs(file);
-  };
+  }, [rawData]);
 
   return (
     <Row>

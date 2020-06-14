@@ -11,12 +11,10 @@ interface RenderOptions<Datum> {
   metricKey: string;
 }
 
-interface SelectionCall<
-  GElement extends BaseType = any,
+interface SelectionCall<GElement extends BaseType = any,
   Datum = any,
   PElement extends BaseType = any,
-  PDatum = any
-> {
+  PDatum = any> {
   (selection: Selection<GElement, Datum, PElement, PDatum>): any;
 }
 
@@ -180,7 +178,7 @@ export function barChart<Datum = any>(
         .merge(metricLabels)
         .transition(transition)
         //@ts-ignore
-        .textTween(function (datum, i) {
+        .textTween(function(datum, i) {
           const last = getMetric(nested?.[current - 1]?.values?.[i]) ?? 0;
           const now = getMetric(datum);
 
